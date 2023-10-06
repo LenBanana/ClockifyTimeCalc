@@ -7,24 +7,30 @@ namespace ClockifyTimeCalc.Puppeteer;
 
 public abstract class ClockifyNavigation
 {
-    public static async Task<IPage?> NavigateClockify()
+    public static async Task<bool> NavigateClockify()
     {
-        var page = await PuppeteerBrowser.Browser.NewPageAsync();
+        var browser = PuppeteerBrowser.Instance;
+        var page = await browser.GetBrowserPageAsync();
+        if (page == null) return false;
+        if (page.Url.StartsWith("https://app.clockify.me/tracker")) return true;
         await page.GoToAsync("https://app.clockify.me/tracker");
         var timeout = (int)TimeSpan.FromMinutes(3).TotalMilliseconds;
-        var elementHandle = await page.WaitForSelectorAsync(".cl-input-timetracker-main",
+        var elementHandle = await page.WaitForSelectorAsync(".cl-card-header",
             new WaitForSelectorOptions() { Timeout = timeout });
-        return elementHandle == null ? null : page;
+        return elementHandle != null;
     }
 
-    public static async Task<List<TimeModel>> GetClockifyTimes(IPage page)
+    public static async Task<List<TimeModel>> GetClockifyTimes()
     {
+        var times = new List<TimeModel>();
+        var browser = PuppeteerBrowser.Instance;
+        var page = await browser.GetBrowserPageAsync();
+        if (page == null) return times;
         var html = await page.GetContentAsync();
         var doc = new HtmlDocument();
         doc.LoadHtml(html);
         var entries = doc.DocumentNode.SelectNodes("//entry-group/div/entry-group-header/div");
         var timeRegex = new Regex(@"(\d{2}):(\d{2}):(\d{2})");
-        var times = new List<TimeModel>();
         foreach (var entry in entries)
         {
             if (entry.ChildNodes.Count <= 1) continue;

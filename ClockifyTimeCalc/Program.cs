@@ -1,4 +1,5 @@
-﻿using ClockifyTimeCalc.Interfaces;
+﻿using ClockifyTimeCalc.Handler;
+using ClockifyTimeCalc.Interfaces;
 
 namespace ClockifyTimeCalc;
 
@@ -8,6 +9,9 @@ internal abstract class Program
 
     private static async Task Main(string[] args)
     {
+        Console.WriteLine("Clockify Time Calculator");
+        Console.WriteLine("Type 'help' for available commands.");
+        SettingsHandler.LoadSettings();
         while (true)
         {
             Console.Write("Enter command: ");

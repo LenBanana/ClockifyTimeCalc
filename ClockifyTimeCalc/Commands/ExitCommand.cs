@@ -7,7 +7,9 @@ public class ExitCommand : ICommand
 {
     public async Task Execute()
     {
-        await PuppeteerBrowser.Browser?.CloseAsync()!;
+        Console.WriteLine("Exiting...");
+        var browser = PuppeteerBrowser.Instance;
+        await browser.CloseAsync()!;
         Environment.Exit(0);
     }
 
