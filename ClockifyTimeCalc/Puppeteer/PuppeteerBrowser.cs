@@ -23,15 +23,17 @@ public class PuppeteerBrowser
             {
                 userDataDir.Create();
             }
+
             Browser = await PuppeteerSharp.Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = false,
                 ExecutablePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe",
-                Args = new[] { 
-                    "--no-sandbox", 
+                Args = new[]
+                {
+                    "--no-sandbox",
                     "--autoplay-policy=no-user-gesture-required"
                 },
-                IgnoredDefaultArgs = new [] { "--disable-extensions" },
+                IgnoredDefaultArgs = new[] { "--disable-extensions" },
                 UserDataDir = userDataDir.FullName
             });
         }
@@ -50,7 +52,13 @@ public class PuppeteerBrowser
             {
                 var pages = await Browser.PagesAsync();
                 var page = pages.FirstOrDefault();
-                return page ?? await Browser.NewPageAsync();
+                page ??= await Browser.NewPageAsync();
+                await page.SetViewportAsync(new ViewPortOptions()
+                {
+                    Width = 1366,
+                    Height = 768
+                });
+                return page;
             }
         }
         catch (Exception ex)
@@ -58,6 +66,7 @@ public class PuppeteerBrowser
             // Handle errors getting a page
             Console.WriteLine($"Error getting browser page: {ex.Message}");
         }
+
         return null;
     }
 
