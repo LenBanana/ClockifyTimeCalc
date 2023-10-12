@@ -1,4 +1,5 @@
-﻿using ClockifyTimeCalc.Models;
+﻿using ClockifyTimeCalc.Handler;
+using ClockifyTimeCalc.Models;
 using HtmlAgilityPack;
 
 namespace ClockifyTimeCalc.Http;
@@ -8,21 +9,21 @@ public abstract class HolidayNavigation
     public static async Task<List<Holiday>> GetHolidays()
     {
         using var client = new HttpClient(); // Ensuring HttpClient disposal
-    
+
         try
         {
-            var response = await client.GetAsync("https://kalender-online.com/?bundesland=9&jahr=2023&feiertage=ges&feiertagsliste=true&schulferien=false&mond=0&legende=true&spalten=&reihen=#");
-        
+            var response = await client.GetAsync(SettingsHandler.GetHolidayUrl());
+
             response.EnsureSuccessStatusCode(); // Throws an exception if the HTTP response was unsuccessful
 
             var html = await response.Content.ReadAsStringAsync();
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
 
-            var tableBody = doc.DocumentNode.SelectSingleNode("//div[@id='divlistfeiertage']/table") ?? throw new Exception("Expected HTML structure not found.");
+            var tableBody = doc.DocumentNode.SelectSingleNode("//div[@id='divlistfeiertage']/table") ??
+                            throw new Exception("Expected HTML structure not found.");
 
-            var rows = tableBody.SelectNodes("tr").Skip(1);
-        
+            var rows = tableBody.SelectNodes("tr");
             return (from row in rows
                 select row.SelectNodes("td")
                 into cells
@@ -50,5 +51,4 @@ public abstract class HolidayNavigation
 
         return new List<Holiday>(); // Return an empty list in case of errors
     }
-
 }

@@ -5,14 +5,39 @@ namespace ClockifyTimeCalc.Puppeteer;
 public class PuppeteerBrowser
 {
     private static PuppeteerBrowser? _instance;
-    public static PuppeteerBrowser Instance => _instance ??= new PuppeteerBrowser();
 
-    private IBrowser? Browser { get; set; }
+    public static PuppeteerBrowser Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = new PuppeteerBrowser();
+            }
+
+            return _instance;
+        }
+    }
+
+    private IBrowser? _browser;
+
+    private IBrowser? Browser
+    {
+        get
+        {
+            if (_browser == null)
+            {
+                InitializeAsync().Wait();
+            }
+
+            return _browser;
+        }
+        set { _browser = value; }
+    }
 
     private PuppeteerBrowser()
     {
-        InitializeAsync().Wait();
-    }
+    } // Keep the constructor private and empty
 
     private async Task InitializeAsync()
     {
@@ -24,7 +49,7 @@ public class PuppeteerBrowser
                 userDataDir.Create();
             }
 
-            Browser = await PuppeteerSharp.Puppeteer.LaunchAsync(new LaunchOptions
+            _browser = await PuppeteerSharp.Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = false,
                 ExecutablePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -72,10 +97,10 @@ public class PuppeteerBrowser
 
     public async Task CloseAsync()
     {
-        if (Browser != null)
+        if (_browser != null)
         {
-            await Browser.CloseAsync();
-            Browser = null;
+            await _browser.CloseAsync();
+            _browser = null;
         }
     }
 }

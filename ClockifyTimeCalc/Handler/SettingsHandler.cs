@@ -17,6 +17,21 @@ public abstract class SettingsHandler
     {
         return Settings.Holidays;
     }
+    
+    public static string GetHolidayUrl()
+    {
+        return Settings.HolidayUrl;
+    }
+    
+    public static int GetHoursPerWorkDay()
+    {
+        return Settings.HoursPerWorkDay;
+    }
+    
+    public static string GetClockifyUrlAddon()
+    {
+        return Settings.ClockifyUrlAddon;
+    }
 
     public static void LoadSettings()
     {
@@ -30,6 +45,10 @@ public abstract class SettingsHandler
         var settings = JsonConvert.DeserializeObject<Settings>(json);
         if (settings == null) return;
         Settings = settings;
+    }
+
+    public static void LogSettings()
+    {
         if (Settings.TotalWorkedTime?.Count == 0 || Settings.TotalWorkedTime == null) return;
         var timeString = WorkTimeHandler.GetTotalWorkTime(Settings.TotalWorkedTime, Settings.Holidays);
         Console.WriteLine(timeString);

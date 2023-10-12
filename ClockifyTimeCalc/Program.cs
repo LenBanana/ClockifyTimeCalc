@@ -20,7 +20,7 @@ internal abstract class Program
             {
                 continue;
             }
-            var command = Commands.FirstOrDefault(cmd => cmd.Key.Contains(commandKey)).Value;
+            var command = Commands.FirstOrDefault(cmd => cmd.Key.Any(c => string.Equals(c, commandKey, StringComparison.CurrentCultureIgnoreCase))).Value;
             if (command != null)
             {
                 await command.Execute();
